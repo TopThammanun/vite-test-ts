@@ -3,7 +3,7 @@ import { Fragment, useState } from "react";
 export default function Table_post() {
   return (
     <Fragment>
-      <div className="overflow-x-auto m-10">
+      <div className="overflow-x-auto m-10 hide">
         <table className="table table-compact w-full">
           <thead>
             <tr className="hover">
