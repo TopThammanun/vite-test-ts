@@ -1,40 +1,29 @@
-import { Fragment, useState } from "react";
-import reactLogo from "./assets/react.svg";
 import "./App.css";
-import Table_post from "./component/Table_post";
-import Card_post from "./component/Card_post";
+
+import { Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import DetailPages from "./pages/DetailPages";
+import Home from "./pages/Home";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    },
+  },
+});
 
 function App() {
   return (
-    <Fragment>
-      <div className="form-control m-10">
-        <div className="input-group">
-          <input
-            type="text"
-            placeholder="Search…"
-            className="input input-bordered"
-          />
-          <button className="btn btn-square">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <Table_post />
-      <Card_post />
-    </Fragment>
+    <QueryClientProvider client={queryClient}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path={encodeURI("/detail/:country")} element={<DetailPages />} />
+      </Routes>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
 

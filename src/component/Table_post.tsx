@@ -1,8 +1,75 @@
-import { Fragment, useState } from "react";
+import Table_card from "./Table_card";
+import React, {
+  FC,
+  ChangeEvent,
+  MouseEvent,
+  useState,
+  Dispatch,
+  SetStateAction,
+  Fragment,
+} from "react";
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Link, useSearchParams } from "react-router-dom";
+
+function usePosts() {
+  return useQuery({
+    queryKey: ["posts"],
+    queryFn: async () => {
+      const { data } = await axios.get(
+        "https://covid-193.p.rapidapi.com/statistics",
+        {
+          headers: {
+            "X-RapidAPI-Key":
+              "30d4347d53mshea909afc5c11a04p151b38jsn9559ce24561b",
+            "X-RapidAPI-Host": "covid-193.p.rapidapi.com",
+          },
+        }
+      );
+      return data.response;
+    },
+  });
+}
 
 export default function Table_post() {
+  const { isLoading, error, data, isFetching } = usePosts();
+  const [searchParams] = useSearchParams();
+  const [searchedVal, setSearchedVal] = useState(
+    searchParams.get("search") ? atob(String(searchParams.get("search"))) : ""
+  );
+
+  if (isLoading) return <div>Loading ....</div>;
+
   return (
     <Fragment>
+      <div className="form-control m-10">
+        <div className="input-group">
+          <input
+            type="text"
+            placeholder="Search…"
+            className="input input-bordered"
+            onChange={(e) => setSearchedVal(e.target.value)}
+            value={searchedVal}
+          />
+          <button className="btn btn-square">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
       <div className="overflow-x-auto m-10 hide">
         <table className="table table-compact w-full">
           <thead>
@@ -10,68 +77,29 @@ export default function Table_post() {
               <th></th>
               <th>Country</th>
               <th>Cases</th>
+              <th>New</th>
               <th>recovered</th>
               <th>Death</th>
               <th>Detail</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="hover">
-              <th>1</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
-              <td>Littel, Schaden and Vandervort</td>
-              <td>Canada</td>
-              <td>12/16/2020</td>
-            </tr>
-            <tr className="hover">
-              <th>2</th>
-              <td>Hart Hagerty</td>
-              <td>Desktop Support Technician</td>
-              <td>Zemlak, Daniel and Leannon</td>
-              <td>United States</td>
-              <td>12/5/2020</td>
-            </tr>
-            <tr className="hover">
-              <th>3</th>
-              <td>Brice Swyre</td>
-              <td>Tax Accountant</td>
-              <td>Carroll Group</td>
-              <td>China</td>
-              <td>8/15/2020</td>
-            </tr>
-            <tr className="hover">
-              <th>4</th>
-              <td>Marjy Ferencz</td>
-              <td>Office Assistant I</td>
-              <td>Rowe-Schoen</td>
-              <td>Russia</td>
-              <td>3/25/2021</td>
-            </tr>
-            <tr className="hover">
-              <th>5</th>
-              <td>Yancy Tear</td>
-              <td>Community Outreach Specialist</td>
-              <td>Wyman-Ledner</td>
-              <td>Brazil</td>
-              <td>5/22/2020</td>
-            </tr>
-            <tr className="hover">
-              <th>6</th>
-              <td>Irma Vasilik</td>
-              <td>Editor</td>
-              <td>Wiza, Bins and Emard</td>
-              <td>Venezuela</td>
-              <td>12/8/2020</td>
-            </tr>
-            <tr className="hover">
-              <th>7</th>
-              <td>Meghann Durtnal</td>
-              <td>Staff Accountant IV</td>
-              <td>Schuster-Schimmel</td>
-              <td>Philippines</td>
-              <td>2/17/2021</td>
-            </tr>
+            {data.length > -1 ? (
+              data
+                .filter(
+                  (row: any) =>
+                    !searchedVal.length ||
+                    row.country
+                      .toString()
+                      .toLowerCase()
+                      .includes(searchedVal.toString().toLowerCase())
+                )
+                .map((x: object) => (
+                  <Table_card dataCountry={x} search={searchedVal} />
+                ))
+            ) : (
+              <></>
+            )}
           </tbody>
         </table>
       </div>
