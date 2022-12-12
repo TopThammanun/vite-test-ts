@@ -35,11 +35,14 @@ function usePosts() {
 export default function Table_post() {
   const { isLoading, error, data, isFetching } = usePosts();
   const [searchParams] = useSearchParams();
+  const [test, setTest] = useState([]);
   const [searchedVal, setSearchedVal] = useState(
     searchParams.get("search") ? atob(String(searchParams.get("search"))) : ""
   );
 
   if (isLoading) return <div>Loading ....</div>;
+
+  console.log(test);
 
   return (
     <Fragment>
@@ -75,6 +78,7 @@ export default function Table_post() {
           <thead>
             <tr className="hover">
               <th></th>
+              <th></th>
               <th>Country</th>
               <th>Cases</th>
               <th>New</th>
@@ -95,7 +99,12 @@ export default function Table_post() {
                       .includes(searchedVal.toString().toLowerCase())
                 )
                 .map((x: object) => (
-                  <Table_card dataCountry={x} search={searchedVal} />
+                  <Table_card
+                    dataCountry={x}
+                    search={searchedVal}
+                    setTest={setTest}
+                    test={test}
+                  />
                 ))
             ) : (
               <></>
